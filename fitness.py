@@ -60,6 +60,5 @@ def fitness(frequency=137, polarizationType='', wires=[(1, 1, 1), (2, 2, 2)]):
     return gain
 
 if __name__=='__main__':
-    gain = fitness()
-
+    gain = fitness(frequency=137, polarizationType='RHP', wires=[(0.5,0.5,0.5),(1,1,1)])
     print(gain)
