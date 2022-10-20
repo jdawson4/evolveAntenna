@@ -8,14 +8,11 @@
 
 import necpp
 
-def nec_error_message():
-    return "NEC ERROR"
-
 # below is some example code from necpp itself.
 # Maybe it'll show me enough to proceed?
 def handle_nec(result):
     if (result != 0):
-        print(nec_error_message())
+        print(necpp.nec_error_message())
  
 def frequency_response():
     # Scan through frequencies from 1 to 30 MHz
@@ -32,18 +29,27 @@ def frequency_response():
         print("f=%0.2fMHz \t(%6.1f,%+6.1fI) Ohms" % (f, z.real, z.imag))
         necpp.nec_delete(nec)
 
-def fitness(frequency=137, num_wires=1):
-    nec = necpp.nec_create()
-    for _ in range(num_wires):
-        handle_nec(necpp.nec_wire(nec, 1, 17, 0, 0, 2, 0, 0, 11, 0.1, 1, 1))
-    handle_nec(necpp.nec_geometry_complete(nec, 1))
-    handle_nec(necpp.nec_gn_card(nec, 1, 0, 0, 0, 0, 0, 0, 0))
-    handle_nec(necpp.nec_fr_card(nec, 0, 1, frequency, 0))
-    handle_nec(necpp.nec_ex_card(nec, 0, 0, 5, 0, 1.0, 0, 0, 0, 0, 0))
-    handle_nec(necpp.nec_rp_card(nec, 0, 90, 1, 0,5,0,0, 0, 90, 1, 0, 0, 0))
-    result_index = 0
-    z = complex(necpp.nec_impedance_real(nec,result_index), necpp.nec_impedance_imag(nec,result_index))
-    print("f=%0.2fMHz \t(%6.1f,%+6.1fI) Ohms" % (frequency, z.real, z.imag))
-    necpp.nec_delete(nec)
+def fitness(frequency=137, polarizationType='', wires=[(1, 1, 1), (2, 2, 2)]):
+    context = necpp.nec_create()
+    previousEnd = (0, 0, 0)
+    for x2, y2, z2 in wires:
+        x1, y1, z1 = previousEnd
+        handle_nec(necpp.nec_wire(context, 1, 1, x1, y1, z1, x2, y2, z2, 0.005, 1, 1))
+        previousEnd = (x2, y2, z2)
+    handle_nec(necpp.nec_geometry_complete(context, 1)) # says that we've now set the antenna geometry
+    handle_nec(necpp.nec_gn_card(context, 4, 0, 0.0, 0.0, 0.5, 0.005, 0.0, 0.0)) # quadruped ground plane where each wire is 5 mm in radius and .5 meters long
+    handle_nec(necpp.nec_fr_card(context, 0, 5, frequency, 0.25)) # checks the base frequency, as well as 4 frequencies 0.25 mhz higher
+    if polarizationType=='RHP':
+        polarization=2
+    else:
+        polarization=0
+    handle_nec(necpp.nec_ex_card(context, polarization, 0, 5, 0, 1.0, 0, 0, 0, 0, 0)) # I have no idea what this does. Something to do with excitation? Polarization?
+    handle_nec(necpp.nec_rp_card(context, 0, 90, 1, 0,5,0,0, 0, 90, 1, 0, 0, 0)) # this is... quite important. It describes the radiation patterns--gain and so on. I can't quite work it out, but this is crucial.
+    
+    # from the example, so maybe ignore:
+    #z = complex(necpp.nec_impedance_real(context,result_index), necpp.nec_impedance_imag(context,result_index))
+    #print("f=%0.2fMHz \t(%6.1f,%+6.1fI) Ohms" % (frequency, z.real, z.imag))
+    
+    necpp.nec_delete(context) # delete now that we have our calculations
 
 fitness()
