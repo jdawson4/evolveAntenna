@@ -32,24 +32,34 @@ def frequency_response():
 def fitness(frequency=137, polarizationType='', wires=[(1, 1, 1), (2, 2, 2)]):
     context = necpp.nec_create()
     previousEnd = (0, 0, 0)
+    i=1
     for x2, y2, z2 in wires:
         x1, y1, z1 = previousEnd
-        handle_nec(necpp.nec_wire(context, 1, 1, x1, y1, z1, x2, y2, z2, 0.005, 1, 1))
+        handle_nec(necpp.nec_wire(context, i, 15, x1, y1, z1, x2, y2, z2, 0.005, 1, 1))
         previousEnd = (x2, y2, z2)
+        i+=1
     handle_nec(necpp.nec_geometry_complete(context, 1)) # says that we've now set the antenna geometry
-    handle_nec(necpp.nec_gn_card(context, 4, 0, 0.0, 0.0, 0.5, 0.005, 0.0, 0.0)) # quadruped ground plane where each wire is 5 mm in radius and .5 meters long
+    handle_nec(necpp.nec_gn_card(context, 1, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)) # quadruped ground plane where each wire is 5 mm in radius and .5 meters long
     handle_nec(necpp.nec_fr_card(context, 0, 5, frequency, 0.25)) # checks the base frequency, as well as 4 frequencies 0.25 mhz higher
     if polarizationType=='RHP':
         polarization=2
     else:
         polarization=0
-    handle_nec(necpp.nec_ex_card(context, polarization, 0, 5, 0, 1.0, 0, 0, 0, 0, 0)) # I have no idea what this does. Something to do with excitation? Polarization?
+    handle_nec(necpp.nec_ex_card(context, polarization, 1, 1, 0, 1.0, 0, 0, 0, 0, 0)) # I have no idea what this does. Something to do with excitation? Polarization?
     handle_nec(necpp.nec_rp_card(context, 0, 90, 1, 0,5,0,0, 0, 90, 1, 0, 0, 0)) # this is... quite important. It describes the radiation patterns--gain and so on. I can't quite work it out, but this is crucial.
     
     # from the example, so maybe ignore:
     #z = complex(necpp.nec_impedance_real(context,result_index), necpp.nec_impedance_imag(context,result_index))
     #print("f=%0.2fMHz \t(%6.1f,%+6.1fI) Ohms" % (frequency, z.real, z.imag))
     
+    # here's the important part:
+    gain = necpp.nec_gain_mean(context, 0)
+
     necpp.nec_delete(context) # delete now that we have our calculations
 
-fitness()
+    return gain
+
+if __name__=='__main__':
+    gain = fitness()
+
+    print(gain)
