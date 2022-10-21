@@ -44,8 +44,8 @@ def fitness(frequency=137, polarizationType='', wires=[(1, 1, 1), (2, 2, 2)]):
     if polarizationType=='RHP':
         polarization=2
     else:
-        polarization=0
-    handle_nec(necpp.nec_ex_card(context, polarization, 1, 1, 0, 1.0, 0, 0, 0, 0, 0)) # I have no idea what this does. Something to do with excitation? Polarization?
+        polarization=1
+    handle_nec(necpp.nec_ex_card(context, polarization, 36, 36, 0, 0, 0, 0, 10, 10, 0)) # I have no idea what this does. Something to do with excitation? Polarization?
     handle_nec(necpp.nec_rp_card(context, 0, 90, 1, 0,5,0,0, 0, 90, 1, 0, 0, 0)) # this is... quite important. It describes the radiation patterns--gain and so on. I can't quite work it out, but this is crucial.
     
     # from the example, so maybe ignore:
@@ -53,11 +53,13 @@ def fitness(frequency=137, polarizationType='', wires=[(1, 1, 1), (2, 2, 2)]):
     #print("f=%0.2fMHz \t(%6.1f,%+6.1fI) Ohms" % (frequency, z.real, z.imag))
     
     # here's the important part:
-    gain = necpp.nec_gain_mean(context, 0)
+    gain = necpp.nec_gain_mean(context, 1)
 
     necpp.nec_delete(context) # delete now that we have our calculations
 
-    return gain
+    return -gain
+    # I am slightly lying--we return *average* gain at one particular frequency
+    # any angle...negated, so that our model can *minimize* this number.
 
 if __name__=='__main__':
     gain = fitness(frequency=137, polarizationType='RHP', wires=[(0.5,0.5,0.5),(1,1,1)])

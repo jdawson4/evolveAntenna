@@ -21,7 +21,8 @@ def optimize():
     # a 52 cm monopole receives 137 MHz, but not well with
     # right-hand-polarized signal, so that's why we need this
     # optimization algorithm!
-    print(f"Hand-designed antenna has a gain of {fitness(frequency=137,polarizationType='RHP',wires=baseAntenna)}")
+    baseAntennaGain = fitness(frequency=137,polarizationType='RHP',wires=baseAntenna)
+    print(f"Hand-designed antenna has a gain of {-baseAntennaGain}")
 
     # okay... now how does scipy's optimizer work?
 
