@@ -29,7 +29,31 @@ def frequency_response():
         print("f=%0.2fMHz \t(%6.1f,%+6.1fI) Ohms" % (f, z.real, z.imag))
         necpp.nec_delete(nec)
 
-def fitness(frequency=137, polarizationType='', wires=[(1, 1, 1), (2, 2, 2)]):
+def fitness(wiresInput=[(1, 1, 1), (2, 2, 2)]):
+    # sorta want these as parameters but whatever
+    frequency=137
+    #polarizationType=''
+    polarizationType='RHP'
+
+    # ok so we're having an issue where the input isn't taking a list of tuples, it's just processing as a... list.
+    # Let's do this:
+    if len(wiresInput)<3:
+        return 999
+    elif isinstance(wiresInput[0], tuple):
+        wires = wiresInput
+    elif isinstance(wiresInput[0], float):
+        j = 0
+        wires = []
+        wiresTemp = []
+        for i in wiresInput:
+            j+=1
+            wiresTemp.append(i)
+            if ((j%3)==0):
+                wires.append(tuple(wiresTemp))
+                wiresTemp = []
+
+    print(wires)
+
     context = necpp.nec_create()
     previousEnd = (0, 0, 0)
     i=1
@@ -62,5 +86,6 @@ def fitness(frequency=137, polarizationType='', wires=[(1, 1, 1), (2, 2, 2)]):
     # any angle...negated, so that our model can *minimize* this number.
 
 if __name__=='__main__':
-    gain = fitness(frequency=137, polarizationType='RHP', wires=[(0.5,0.5,0.5),(1,1,1)])
+    #gain = fitness(frequency=137, polarizationType='RHP', wires=[(0.5,0.5,0.5),(1,1,1)])
+    gain = fitness(wiresInput=[0.0,0.0,0.52])
     print(gain)
