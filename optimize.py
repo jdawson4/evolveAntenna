@@ -12,7 +12,8 @@
 # the evolutionary approach!
 
 from fitness import *
-from scipy.optimize import minimize, basinhopping
+from scipy.optimize import basinhopping
+#from scipy.optimize import minimize
 
 def optimize():
     # we'll compare our results against a monopole that I hand-design

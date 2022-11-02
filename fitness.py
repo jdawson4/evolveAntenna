@@ -49,7 +49,7 @@ def fitness(wiresInput=[(1, 1, 1), (2, 2, 2)]):
     # we have to do some weird preprocessing because the library we're
     # using is based on compiled c/fortran code so it's finicky.
     if len(wiresInput)<3:
-        print(999)
+        #print(999)
         return 999
     elif isinstance(wiresInput[0], tuple):
         wires = wiresInput
@@ -78,7 +78,7 @@ def fitness(wiresInput=[(1, 1, 1), (2, 2, 2)]):
                         #print('here!')
                         return 999
             allCoords.append(coord)'''
-    print(wires)
+    #print(wires)
 
     try:
         context = necpp.nec_create()
@@ -86,7 +86,7 @@ def fitness(wiresInput=[(1, 1, 1), (2, 2, 2)]):
         i=1
         for x2, y2, z2 in wires:
             if z2 < 0:
-                print(999)
+                #print(999)
                 return 999 # can't go below ground!
             x1, y1, z1 = previousEnd
             handle_nec(necpp.nec_wire(context, i, 15, x1, y1, z1, x2, y2, z2, 0.001, 1, 1))
@@ -126,21 +126,21 @@ def fitness(wiresInput=[(1, 1, 1), (2, 2, 2)]):
         
         
         # here's the important part:
-        #gain = necpp.nec_gain_mean(context, 1)
+        gain = necpp.nec_gain_mean(context, 1)
         #gain = necpp.nec_gain_max(context, 1)
-        gain = necpp.nec_gain_min(context, 1)
+        #gain = necpp.nec_gain_min(context, 1)
         # MEAN gain in order to make... something
         # MAX gain to make a directional antenna,
         # MIN gain to make an omnidirectional? Not too sure!
 
         necpp.nec_delete(context) # delete now that we have our calculations
     except:
-        print(999)
+        #print(999)
         return 999.0
         # if the processing gets fucked up, we just want to make the alg know
         # that that antenna is invalid.
     
-    print(gain)
+    #print(gain)
 
     return -gain
     # I am slightly lying--we return gain... negated, so that our model
