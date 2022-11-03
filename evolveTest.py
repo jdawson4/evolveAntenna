@@ -12,17 +12,18 @@ from scipy.optimize import differential_evolution
 def evolve(num_wires=5):
     results = differential_evolution(
         func = fitness,
-        bounds = [(0.001,1.5), (0.001,1.5), (0.001,1.5),] * num_wires,
-        popsize = 20,
-        maxiter = 50,
+        bounds = [(-1.0,1.0), (-1.5,1.0), (0.001,1.0),] * num_wires,
+        popsize = 10,
+        maxiter = 5,
         seed = 3,
         workers = -1,
         disp = True,
         updating = "deferred",
+        polish = False,
     )
     print(results)
     return results.x
 
 
 if __name__=='__main__':
-    evolve(num_wires=3)
+    evolve(num_wires=5)

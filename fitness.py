@@ -7,27 +7,17 @@
 # get, but we can consider this the "loss" we are minimizing.
 
 import necpp
+from shapely.geometry import LineString
 
-# below is some example code from necpp itself.
-# Maybe it'll show me enough to proceed?
 def handle_nec(result):
     if (result != 0):
         print(necpp.nec_error_message())
- 
-def frequency_response():
-    # Scan through frequencies from 1 to 30 MHz
-    for f in range(1,30):
-        nec = necpp.nec_create()
-        handle_nec(necpp.nec_wire(nec, 1, 17, 0, 0, 2, 0, 0, 11, 0.1, 1, 1))
-        handle_nec(necpp.nec_geometry_complete(nec, 1))
-        handle_nec(necpp.nec_gn_card(nec, 1, 0, 0, 0, 0, 0, 0, 0))
-        handle_nec(necpp.nec_fr_card(nec, 0, 1, f, 0))
-        handle_nec(necpp.nec_ex_card(nec, 0, 0, 5, 0, 1.0, 0, 0, 0, 0, 0))
-        handle_nec(necpp.nec_rp_card(nec, 0, 90, 1, 0,5,0,0, 0, 90, 1, 0, 0, 0))
-        result_index = 0
-        z = complex(necpp.nec_impedance_real(nec,result_index), necpp.nec_impedance_imag(nec,result_index))
-        print("f=%0.2fMHz \t(%6.1f,%+6.1fI) Ohms" % (f, z.real, z.imag))
-        necpp.nec_delete(nec)
+
+# some dirty code for computing if two wires intersect:
+def linesIntersect(a,b):
+    x = LineString(a)
+    y = LineString(b)
+    return x.crosses(y)
 
 def fitness(wiresInput=[(1, 1, 1), (2, 2, 2)]):
     # I'll make a few notes for frequencies I might wanna receive here:
@@ -48,10 +38,7 @@ def fitness(wiresInput=[(1, 1, 1), (2, 2, 2)]):
 
     # we have to do some weird preprocessing because the library we're
     # using is based on compiled c/fortran code so it's finicky.
-    if len(wiresInput)<3:
-        #print(999)
-        return 999
-    elif isinstance(wiresInput[0], tuple):
+    if isinstance(wiresInput[0], tuple):
         wires = wiresInput
     elif isinstance(wiresInput[0], float):
         j = 0
@@ -83,12 +70,19 @@ def fitness(wiresInput=[(1, 1, 1), (2, 2, 2)]):
     try:
         context = necpp.nec_create()
         previousEnd = (0, 0, 0)
+        lines = []
         i=1
         for x2, y2, z2 in wires:
-            if z2 < 0:
+            if z2 <= 0.0:
                 #print(999)
                 return 999 # can't go below ground!
             x1, y1, z1 = previousEnd
+            newestLine = ((x1,y1,z1), (x2,y2,z2))
+            for line in lines:
+                if linesIntersect(newestLine, line):
+                    #print(newestLine, line)
+                    return 999 # wires can't intersect! Short circuiting is bad!
+            lines.append(newestLine)
             handle_nec(necpp.nec_wire(context, i, 15, x1, y1, z1, x2, y2, z2, 0.001, 1, 1))
             previousEnd = (x2, y2, z2)
             i+=1
@@ -134,8 +128,9 @@ def fitness(wiresInput=[(1, 1, 1), (2, 2, 2)]):
         # MIN gain to make an omnidirectional? Not too sure!
 
         necpp.nec_delete(context) # delete now that we have our calculations
-    except:
+    except Exception as e:
         #print(999)
+        print(e)
         return 999.0
         # if the processing gets fucked up, we just want to make the alg know
         # that that antenna is invalid.
