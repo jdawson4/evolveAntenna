@@ -34,7 +34,6 @@ def fitness(wiresInput=[(1, 1, 1), (2, 2, 2)]):
     frequency=54
     #polarizationType=''
     polarizationType='LIN'
-    epsilon = 0.00001 # this parameter makes sure that we're not inserting wires that are too similar!
 
     # we have to do some weird preprocessing because the library we're
     # using is based on compiled c/fortran code so it's finicky.
@@ -91,10 +90,10 @@ def fitness(wiresInput=[(1, 1, 1), (2, 2, 2)]):
         
         # here we define the frequencies we're looking for. The parameters here
         # define a frequency, and then x other frequencies y steps above that
-        # base frequency. Important! This defines how broad of a band our\
+        # base frequency. Important! This defines how broad of a band our
         # antenna works for!
-        #handle_nec(necpp.nec_fr_card(context, 0, 5, frequency, 0.25)) # checks the base frequency, as well as 4 frequencies 0.25 mhz higher
-        handle_nec(necpp.nec_fr_card(context, 0, 100, frequency, 6)) # checks 100 frequencies above the given freq, each 6 MHz apart. For tv, input 54 as base frequency.
+        #handle_nec(necpp.nec_fr_card(context, 0, 5, 137, 0.25)) # checks the 137MHz, as well as 4 frequencies 0.25 mhz higher, to cover the entire LEO weather satellite band.
+        handle_nec(necpp.nec_fr_card(context, 0, 100, 54, 6)) # checks 100 frequencies above the 54MHz, each 6 MHz apart
 
         
         # Polarization determines A LOT about antenna architecture. We have
@@ -115,8 +114,12 @@ def fitness(wiresInput=[(1, 1, 1), (2, 2, 2)]):
             polarization=1
 
 
-        handle_nec(necpp.nec_ex_card(context, polarization, 36, 36, 0, 0, 0, 0, 10, 10, 0)) # here's where polarization gets applied
-        handle_nec(necpp.nec_rp_card(context, 0, 90, 1, 0,5,0,0, 0, 90, 1, 0, 0, 0)) # this is... quite important. It describes the radiation patterns--gain and so on. I can't quite work it out, but this is crucial.
+        # here's where polarization gets applied
+        handle_nec(necpp.nec_ex_card(context, polarization, 36, 36, 0, 0, 0, 0, 10, 10, 0))
+
+
+        # this is... quite important. It describes the radiation patterns, particularly where they're coming from.
+        handle_nec(necpp.nec_rp_card(context, 0, 10, 10, 0,5,0,0, 0, 0, 18, 36, 0, 0)) # I believe that this specifies that it's coming from all angles above the ground?
         
         
         # here's the important part:
@@ -135,15 +138,10 @@ def fitness(wiresInput=[(1, 1, 1), (2, 2, 2)]):
         # if the processing gets fucked up, we just want to make the alg know
         # that that antenna is invalid.
     
-    #print(gain)
-
     return -gain
-    # I am slightly lying--we return gain... negated, so that our model
-    # can *minimize* the negative gain (that is, maximize the gain.)
-    # This weird inversion is happening because most optimization algorithms
-    # are actually seeking to minimize mathematical functions.
+    # we return gain negated, so that our model can *minimize* the negative
+    # gain (that is, maximize the gain.)
 
 if __name__=='__main__':
-    #gain = fitness(frequency=137, polarizationType='RHP', wires=[(0.5,0.5,0.5),(1,1,1)])
     gain = fitness(wiresInput=[0.0,0.3,1.3])
     print(gain)
