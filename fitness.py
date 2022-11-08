@@ -12,6 +12,8 @@ from shapely.geometry import LineString
 def handle_nec(result):
     if (result != 0):
         print(necpp.nec_error_message())
+        return True
+    return False
 
 # some dirty code for computing if two wires intersect:
 def linesIntersect(a,b):
@@ -82,10 +84,11 @@ def fitness(wiresInput=[(1, 1, 1), (2, 2, 2)]):
                     #print(newestLine, line)
                     return 999 # wires can't intersect! Short circuiting is bad!
             lines.append(newestLine)
-            handle_nec(necpp.nec_wire(context, i, 15, x1, y1, z1, x2, y2, z2, 0.001, 1, 1))
+            handle_nec(necpp.nec_wire(context, i, 1, x1, y1, z1, x2, y2, z2, 0.001, 1, 1))
             previousEnd = (x2, y2, z2)
             i+=1
-        handle_nec(necpp.nec_geometry_complete(context, 1)) # says that we've now set the antenna geometry
+        if(handle_nec(necpp.nec_geometry_complete(context, 1))): # says that we've now set the antenna geometry
+            return 999.0 # this messes up frequently, so if it does return max gain
         handle_nec(necpp.nec_gn_card(context, 1, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)) # defines ground plane as an infinite surface. Much simpler that way.
         
         # here we define the frequencies we're looking for. The parameters here
@@ -124,12 +127,12 @@ def fitness(wiresInput=[(1, 1, 1), (2, 2, 2)]):
         
         
         # here's the important part:
-        gain = necpp.nec_gain_mean(context, 1)
+        #gain = necpp.nec_gain_mean(context, 1)
         #gain = necpp.nec_gain_max(context, 1)
-        #gain = necpp.nec_gain_min(context, 1)
-        # MEAN gain in order to make... something
+        gain = necpp.nec_gain_min(context, 1)
+        # MEAN gain in order to make an omnidirectional... but there again it might just maximize a node still?
         # MAX gain to make a directional antenna,
-        # MIN gain to make an omnidirectional? Not too sure!
+        # MIN gain to make an omnidirectional? Or will this penalize nulls too much? Maybe a unity gain?
 
         necpp.nec_delete(context) # delete now that we have our calculations
     except Exception as e:

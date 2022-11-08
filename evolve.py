@@ -20,7 +20,7 @@ def optimize(num_wires=5):
     # for a given purpose. An easy rule of thumb is to make a quarter-wave
     # dipole. I use this calculator to find the vertical height:
     # m0ukd.com/calculators/quarter-wave-ground-plane-antenna-calculator/
-    baseAntenna = [0.0,0.0,0.356] # z is up!
+    baseAntenna = [0.0,0.0,0.178, 0.0,0.0,0.356] # z is up! Also, there are two parts here because c3cpp can't do single-wire antennas for some reason
     baseAntennaGain = fitness(wiresInput=baseAntenna)
     print(f"Hand-designed antenna has a gain of {-baseAntennaGain}")
 
@@ -62,7 +62,8 @@ def optimize(num_wires=5):
     # WITHOUT an initial guess!
     results = differential_evolution(
         func = fitness,
-        bounds = [(-1.0,1.0), (-1.0,1.0), (0.001,1.0),] * num_wires,
+        bounds = [(-0.4,0.4), (-0.4,0.4), (0.1,0.4),] * num_wires,
+        # modify these ^ dimensions to specify the bounds on antenna shape!
         popsize = 10,
         maxiter = 5,
         seed = 3,
