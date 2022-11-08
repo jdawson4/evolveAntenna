@@ -119,7 +119,8 @@ def fitness(wiresInput=[(1, 1, 1), (2, 2, 2)]):
 
 
         # this is... quite important. It describes the radiation patterns, particularly where they're coming from.
-        handle_nec(necpp.nec_rp_card(context, 0, 10, 10, 0,5,0,0, 0, 0, 18, 36, 0, 0)) # I believe that this specifies that it's coming from all angles above the ground?
+        #handle_nec(necpp.nec_rp_card(context, 0, 10, 10, 0,5,0,0, 0, 0, 18, 36, 0, 0)) # all angles above the ground? (satellites)
+        handle_nec(necpp.nec_rp_card(context, 0, 5, 10, 0,5,0,0, 0, 0, 6, 36, 0, 0)) # only 30 degrees above ground? (terrestrial signals)
         
         
         # here's the important part:
