@@ -146,9 +146,16 @@ def fitness(wiresInput):
     return -min_gain
 
 if __name__=='__main__':
-    #gain = fitness(wiresInput=[0.0,0.0,0.5, 0.0,0.0,1.0])
-    evolvedTVAntenna = [-0.2170649,0.08211413,0.11587374,0.11032273,-0.00727395,0.39316114,0.38241553,-0.13979879,0.32285156,0.37539444,0.1980235,0.18295936,0.25851554,0.10262777,0.31215069]
-    wires, wireLength, mean_gain, max_gain, min_gain = processAntenna(evolvedTVAntenna)
+    
+    # until I come up with a better way of doing this, I'll record my finished antennas here:
+    # 5 wires, evolved for min gain, for tv frequencies:
+    tvAntenna5Wires_minGain = [-0.2170649,0.08211413,0.11587374,0.11032273,-0.00727395,0.39316114,0.38241553,-0.13979879,0.32285156,0.37539444,0.1980235,0.18295936,0.25851554,0.10262777,0.31215069]
+    
+    # 3 wires, evolved for min gain, for tv frequencies:
+    tvAntenna3Wires_minGain = [-0.36813742,0.04660534,0.20281676,0.36912827,-0.05468209,0.38111223,0.29000245,-0.32773359,0.16520391]
+    
+    
+    wires, wireLength, mean_gain, max_gain, min_gain = processAntenna(tvAntenna3Wires_minGain)
     print('mean_gain', mean_gain)
     print('max_gain', max_gain)
     print('min_gain', min_gain)
