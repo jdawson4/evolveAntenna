@@ -22,7 +22,9 @@ def optimize(num_wires=5):
     # m0ukd.com/calculators/quarter-wave-ground-plane-antenna-calculator/
     baseAntenna = [0.0,0.0,0.178, 0.0,0.0,0.356] # z is up! Also, there are two parts here because c3cpp can't do single-wire antennas for some reason
     baseAntennaGain = fitness(wiresInput=baseAntenna)
-    print(f"Hand-designed antenna has a gain of {-baseAntennaGain}")
+    print(f"Hand-designed antenna has a fitness of {-baseAntennaGain}")
+    _, _, mean_gain, max_gain, min_gain = processAntenna(baseAntenna)
+    print(f"mean:{mean_gain}\nmax:{max_gain}\nmin:{min_gain}")
 
     # okay... now how does scipy's optimizer work?
     # res = minimize(fun = simple_poly, x0 = 20)
@@ -72,7 +74,9 @@ def optimize(num_wires=5):
         updating = "deferred",
         polish = False,
     )
-    print(results)
+    print("best antenna:",results)
+    _, _, mean_gain, max_gain, min_gain = processAntenna(baseAntenna)
+    print(f"mean:{mean_gain}\nmax:{max_gain}\nmin:{min_gain}")
     return results.x
 
 
