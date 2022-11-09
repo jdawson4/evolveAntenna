@@ -6,6 +6,7 @@
 # what we optimize upon! Not sure how machine-learning our optimiziation will
 # get, but we can consider this the "loss" we are minimizing.
 
+from concurrent.futures import process
 import necpp
 from shapely.geometry import LineString
 
@@ -21,7 +22,11 @@ def linesIntersect(a,b):
     y = LineString(b)
     return x.crosses(y)
 
-def fitness(wiresInput=[(1, 1, 1), (2, 2, 2)]):
+def compute_length(wires):
+    #TODO
+    return 1.0
+
+def processAntenna(wiresInput=[(1, 1, 1), (2, 2, 2)]):
     # I'll make a few notes for frequencies I might wanna receive here:
     # AM radio broadcasts are 540 kHz up to 1700 kHz (1.7 MHz). These are vertically polarized
     # FM radio broadcasts are from 88 MHz to 108 MHz, and should be easy to receive. Probably vertically polarized
@@ -53,20 +58,6 @@ def fitness(wiresInput=[(1, 1, 1), (2, 2, 2)]):
                 wiresTemp = []
             else:
                 wiresTemp.append(i)
-    '''allCoords = []
-    for coords in wires:
-        for coord in coords:
-            if coord == 0.0:
-                #print('ignoring')
-                continue
-            else:
-                for c in allCoords:
-                    if abs(c - coord) < epsilon:
-                        print(999)
-                        #print('here!')
-                        return 999
-            allCoords.append(coord)'''
-    #print(wires)
 
     try:
         context = necpp.nec_create()
@@ -76,19 +67,22 @@ def fitness(wiresInput=[(1, 1, 1), (2, 2, 2)]):
         for x2, y2, z2 in wires:
             if z2 <= 0.0:
                 #print(999)
-                return 999 # can't go below ground!
+                return [], 1.0, -999.0, -999.0, -999.0
+                # can't go below ground!
             x1, y1, z1 = previousEnd
             newestLine = ((x1,y1,z1), (x2,y2,z2))
             for line in lines:
                 if linesIntersect(newestLine, line):
                     #print(newestLine, line)
-                    return 999 # wires can't intersect! Short circuiting is bad!
+                    return [], 1.0, -999.0, -999.0, -999.0
+                    # wires can't intersect! Short circuiting is bad!
             lines.append(newestLine)
             handle_nec(necpp.nec_wire(context, i, 1, x1, y1, z1, x2, y2, z2, 0.001, 1, 1))
             previousEnd = (x2, y2, z2)
             i+=1
         if(handle_nec(necpp.nec_geometry_complete(context, 1))): # says that we've now set the antenna geometry
-            return 999.0 # this messes up frequently, so if it does return max gain
+            # sometimes this messes up though, so return our "failure" signature
+            return [], 1.0, -999.0, -999.0, -999.0
         handle_nec(necpp.nec_gn_card(context, 1, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)) # defines ground plane as an infinite surface. Much simpler that way.
         
         # here we define the frequencies we're looking for. The parameters here
@@ -125,9 +119,9 @@ def fitness(wiresInput=[(1, 1, 1), (2, 2, 2)]):
         
         
         # here's the important part:
-        #gain = necpp.nec_gain_mean(context, 1)
-        #gain = necpp.nec_gain_max(context, 1)
-        gain = necpp.nec_gain_min(context, 1)
+        mean_gain = necpp.nec_gain_mean(context, 1)
+        max_gain = necpp.nec_gain_max(context, 1)
+        min_gain = necpp.nec_gain_min(context, 1)
         # MEAN gain in order to make an omnidirectional... but there again it might just maximize a node still?
         # MAX gain to make a directional antenna,
         # MIN gain to make an omnidirectional? Or will this penalize nulls too much? Maybe a unity gain?
@@ -136,14 +130,25 @@ def fitness(wiresInput=[(1, 1, 1), (2, 2, 2)]):
     except Exception as e:
         #print(999)
         print(e)
-        return 999.0
+        return [], 1.0, -999.0, -999.0, -999.0
         # if the processing gets fucked up, we just want to make the alg know
         # that that antenna is invalid.
-    
-    return -gain
+    wireLength = compute_length(wires)
+    return wires, wireLength, mean_gain, max_gain, min_gain
     # we return gain negated, so that our model can *minimize* the negative
     # gain (that is, maximize the gain.)
 
+# we simplify the results of the processing function here. This way, we can do
+# more complex behavior, like weighting different metrics against one another,
+# maybe?
+def fitness(wiresInput):
+    wires, wireLength, mean_gain, max_gain, min_gain = processAntenna(wiresInput)
+    return -min_gain
+
 if __name__=='__main__':
-    gain = fitness(wiresInput=[0.0,0.0,0.5, 0.0,0.0,1.0])
-    print(gain)
+    #gain = fitness(wiresInput=[0.0,0.0,0.5, 0.0,0.0,1.0])
+    evolvedTVAntenna = [-0.2170649,0.08211413,0.11587374,0.11032273,-0.00727395,0.39316114,0.38241553,-0.13979879,0.32285156,0.37539444,0.1980235,0.18295936,0.25851554,0.10262777,0.31215069]
+    wires, wireLength, mean_gain, max_gain, min_gain = processAntenna(evolvedTVAntenna)
+    print('mean_gain', mean_gain)
+    print('max_gain', max_gain)
+    print('min_gain', min_gain)
