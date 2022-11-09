@@ -64,8 +64,8 @@ def optimize(num_wires=5):
         func = fitness,
         bounds = [(-0.4,0.4), (-0.4,0.4), (0.1,0.4),] * num_wires,
         # modify these ^ dimensions to specify the bounds on antenna shape!
-        popsize = 10,
-        maxiter = 5,
+        popsize = 50,
+        maxiter = 20,
         seed = 3,
         workers = -1,
         disp = True,

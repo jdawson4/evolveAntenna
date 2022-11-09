@@ -115,8 +115,6 @@ def fitness(wiresInput=[(1, 1, 1), (2, 2, 2)]):
             polarization=1
         else:
             polarization=1
-
-
         # here's where polarization gets applied
         handle_nec(necpp.nec_ex_card(context, polarization, 36, 36, 0, 0, 0, 0, 10, 10, 0))
 
@@ -147,5 +145,5 @@ def fitness(wiresInput=[(1, 1, 1), (2, 2, 2)]):
     # gain (that is, maximize the gain.)
 
 if __name__=='__main__':
-    gain = fitness(wiresInput=[0.0,0.3,1.3])
+    gain = fitness(wiresInput=[0.0,0.0,0.5, 0.0,0.0,1.0])
     print(gain)
