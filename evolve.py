@@ -75,8 +75,8 @@ def optimize(num_wires=5):
         polish = False,
     )
     print("best antenna:",results)
-    _, _, mean_gain, max_gain, min_gain = processAntenna(baseAntenna)
-    print(f"mean:{mean_gain}\nmax:{max_gain}\nmin:{min_gain}")
+    _, wireLength, mean_gain, max_gain, min_gain = processAntenna(baseAntenna)
+    print(f"mean:{mean_gain}\nmax:{max_gain}\nmin:{min_gain}\ntotal wire length:{wireLength}")
     return results.x
 
 

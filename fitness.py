@@ -168,6 +168,4 @@ if __name__=='__main__':
     tvAntenna3Wires_meanGain_xzPlain = [0.38845274,0,0.21796932,-0.39259615,0,0.39595648,-0.39406343,0,0.10534551]
 
     wires, wireLength, mean_gain, max_gain, min_gain = processAntenna(tvAntenna3Wires_meanGain_xzPlain)
-    print('mean_gain', mean_gain)
-    print('max_gain', max_gain)
-    print('min_gain', min_gain)
+    print(f"mean:{mean_gain}\nmax:{max_gain}\nmin:{min_gain}\ntotal wire length:{wireLength} meters")
