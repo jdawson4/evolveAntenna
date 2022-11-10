@@ -6,9 +6,9 @@
 # what we optimize upon! Not sure how machine-learning our optimiziation will
 # get, but we can consider this the "loss" we are minimizing.
 
-from concurrent.futures import process
 import necpp
 from shapely.geometry import LineString
+from math import sqrt
 
 def handle_nec(result):
     if (result != 0):
@@ -23,8 +23,13 @@ def linesIntersect(a,b):
     return x.crosses(y)
 
 def compute_length(wires):
-    #TODO
-    return 1.0
+    sum = 0.0
+    previous = (0.0, 0.0, 0.0)
+    for x2,y2,z2 in wires:
+        x1,y1,z1 = previous
+        sum += sqrt(((x1 - x2)**2) + ((y1 - y2)**2) + ((z1 - z2)**2))
+        previous = (x2, y2, z2)
+    return sum
 
 def processAntenna(wiresInput=[(1, 1, 1), (2, 2, 2)]):
     # I'll make a few notes for frequencies I might wanna receive here:
@@ -124,7 +129,7 @@ def processAntenna(wiresInput=[(1, 1, 1), (2, 2, 2)]):
         min_gain = necpp.nec_gain_min(context, 1)
         # MEAN gain in order to make an omnidirectional... but there again it might just maximize a node still?
         # MAX gain to make a directional antenna,
-        # MIN gain to make an omnidirectional? Or will this penalize nulls too much? Maybe a unity gain?
+        # MIN gain to make an omnidirectional, but I am concerned this will penalize nulls too much
 
         necpp.nec_delete(context) # delete now that we have our calculations
     except Exception as e:
@@ -143,19 +148,26 @@ def processAntenna(wiresInput=[(1, 1, 1), (2, 2, 2)]):
 # maybe?
 def fitness(wiresInput):
     wires, wireLength, mean_gain, max_gain, min_gain = processAntenna(wiresInput)
-    return -min_gain
+    return -mean_gain
 
 if __name__=='__main__':
     
-    # until I come up with a better way of doing this, I'll record my finished antennas here:
+    # until I come up with a better way of doing this, I'll record my finished
+    # antennas here:
     # 5 wires, evolved for min gain, for tv frequencies:
     tvAntenna5Wires_minGain = [-0.2170649,0.08211413,0.11587374,0.11032273,-0.00727395,0.39316114,0.38241553,-0.13979879,0.32285156,0.37539444,0.1980235,0.18295936,0.25851554,0.10262777,0.31215069]
     
     # 3 wires, evolved for min gain, for tv frequencies:
     tvAntenna3Wires_minGain = [-0.36813742,0.04660534,0.20281676,0.36912827,-0.05468209,0.38111223,0.29000245,-0.32773359,0.16520391]
     
+    # 3 wires, evolved for mean gain, for tv frequencies:
+    tvAntenna3Wires_meanGain = [-0.35906988,-0.15302196,0.16442577,0.35571068,0.0245733,0.29642038,0.33722326,0.34880001,0.10220936]
     
-    wires, wireLength, mean_gain, max_gain, min_gain = processAntenna(tvAntenna3Wires_minGain)
+    # 3 wires evolved for mean for TV frequencies, but the y axis has been
+    # restricted to 0. This antenna is 2D!
+    tvAntenna3Wires_meanGain_xzPlain = [0.38845274,0,0.21796932,-0.39259615,0,0.39595648,-0.39406343,0,0.10534551]
+
+    wires, wireLength, mean_gain, max_gain, min_gain = processAntenna(tvAntenna3Wires_meanGain_xzPlain)
     print('mean_gain', mean_gain)
     print('max_gain', max_gain)
     print('min_gain', min_gain)
