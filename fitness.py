@@ -43,7 +43,7 @@ def processAntenna(wiresInput=[(1, 1, 1), (2, 2, 2)]):
     # (higher gain required for higher frequencies because of atmospheric attenuation!)
 
     # sorta want these as parameters but whatever
-    polarizationType='LIN'
+    polarizationType='RHC'
 
     # we have to do some weird preprocessing because the library we're
     # using is based on compiled c/fortran code so it's finicky.
@@ -92,10 +92,10 @@ def processAntenna(wiresInput=[(1, 1, 1), (2, 2, 2)]):
         # define a frequency, and then x other frequencies y steps above that
         # base frequency. Important! This defines how broad of a band our
         # antenna works for!
-        #handle_nec(necpp.nec_fr_card(context, 0, 5, 137, 0.25)) # checks the 137MHz, as well as 4 frequencies 0.25 mhz higher, to cover the entire LEO weather satellite band.
+        handle_nec(necpp.nec_fr_card(context, 0, 25, 137, 0.04)) # checks the 137MHz-138
         #handle_nec(necpp.nec_fr_card(context, 0, 100, 54, 6)) # checks 100 frequencies above the 54MHz, each 6 MHz apart
         #handle_nec(necpp.nec_fr_card(context, 0, 7, 174, 6)) # checks VHF frequencies 174-216 (VHF high)
-        handle_nec(necpp.nec_fr_card(context, 0, 23, 470, 6)) # checks the entire TV UHF band
+        #handle_nec(necpp.nec_fr_card(context, 0, 23, 470, 6)) # checks the entire TV UHF band
 
         
         # Polarization determines A LOT about antenna architecture. We have
@@ -104,9 +104,9 @@ def processAntenna(wiresInput=[(1, 1, 1), (2, 2, 2)]):
         # Left- and right-handed are used by satellites, whereas most
         # terrestrial applications are linearly polarized. Natural radio
         # sources tend to be unpolarized, but there are exceptions!
-        if polarizationType=='RHP':
+        if polarizationType=='RHC':
             polarization=2
-        elif polarizationType=='LHP':
+        elif polarizationType=='LHC':
             polarization=3
         elif polarizationType=='':
             polarization=1
@@ -119,9 +119,10 @@ def processAntenna(wiresInput=[(1, 1, 1), (2, 2, 2)]):
 
 
         # this is... quite important. It describes the radiation patterns, particularly where they're coming from.
-        #handle_nec(necpp.nec_rp_card(context, 0, 10, 10, 0,5,0,0, 0, 0, 18, 36, 0, 0)) # all angles above the ground (satellites)
-        #handle_nec(necpp.nec_rp_card(context, 0, 10, 10, 0,5,0,0, 60, 0, 6, 36, 0, 0)) # everywhere 30 degrees above ground? (terrestrial signals)
-        handle_nec(necpp.nec_rp_card(context, 0, 1, 1, 0,0,0,0, 90, 0, 1, 1, 0, 0)) # terrestrial signals, but from one spot along the horizon
+        #handle_nec(necpp.nec_rp_card(context, 0, 10, 10, 0,5,0,0, 0, 0, 18, 36, 0, 0)) # all angles above the ground
+        handle_nec(necpp.nec_rp_card(context, 0, 10, 10, 0,5,0,0, 0, 0, 6, 36, 0, 0)) # all >30 degrees above the ground (satellites)
+        #handle_nec(necpp.nec_rp_card(context, 0, 10, 10, 0,5,0,0, 60, 0, 6, 36, 0, 0)) # everywhere less than 30 degrees above ground (terrestrial signals)
+        #handle_nec(necpp.nec_rp_card(context, 0, 1, 1, 0,0,0,0, 90, 0, 1, 1, 0, 0)) # terrestrial signals, but from one spot along the horizon
         
         # here's the important part:
         mean_gain = necpp.nec_gain_mean(context, 1)
@@ -157,7 +158,7 @@ def lengthOfSegments(wires):
         x1,y1,z1 = previous
         length = sqrt(((x1 - x2)**2) + ((y1 - y2)**2) + ((z1 - z2)**2))
         previous = (x2, y2, z2)
-        print(f"segment {segment}: {length} meters, or {length * 39.37} inches")
+        print(f"segment {segment}: {length:.5} meters, or {(length * 39.37):.5} inches")
         segment += 1
 
 if __name__=='__main__':
@@ -170,6 +171,12 @@ if __name__=='__main__':
         0.09976958, -0.09852782, 0.032572
     ]
 
-    wires, wireLength, mean_gain, max_gain, min_gain = processAntenna(uhf_high_gain)
-    print(f"mean:{mean_gain}\nmax:{max_gain}\nmin:{min_gain}\ntotal wire length:{wireLength} meters\n")
+    noaaSatelliteAntenna = [
+        0.06007878, 0.05595085, 0.0722251,
+        -0.08225932, -0.05269982, 0.01606696,
+        0.08835985, 0.0832063, 0.01526375
+    ]
+
+    wires, wireLength, mean_gain, max_gain, min_gain = processAntenna(noaaSatelliteAntenna)
+    print(f"mean:{mean_gain:.5}\nmax:{max_gain:.5}\nmin:{min_gain:.5}\ntotal wire length:{wireLength:.5} meters, or {(wireLength * 39.37):.5} inches\n")
     lengthOfSegments(wires)
