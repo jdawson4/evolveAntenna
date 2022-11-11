@@ -12,7 +12,7 @@ from math import sqrt
 
 def handle_nec(result):
     if (result != 0):
-        print(necpp.nec_error_message())
+        #print(necpp.nec_error_message())
         return True
     return False
 
@@ -43,8 +43,6 @@ def processAntenna(wiresInput=[(1, 1, 1), (2, 2, 2)]):
     # (higher gain required for higher frequencies because of atmospheric attenuation!)
 
     # sorta want these as parameters but whatever
-    frequency=54
-    #polarizationType=''
     polarizationType='LIN'
 
     # we have to do some weird preprocessing because the library we're
@@ -95,7 +93,8 @@ def processAntenna(wiresInput=[(1, 1, 1), (2, 2, 2)]):
         # base frequency. Important! This defines how broad of a band our
         # antenna works for!
         #handle_nec(necpp.nec_fr_card(context, 0, 5, 137, 0.25)) # checks the 137MHz, as well as 4 frequencies 0.25 mhz higher, to cover the entire LEO weather satellite band.
-        handle_nec(necpp.nec_fr_card(context, 0, 100, 54, 6)) # checks 100 frequencies above the 54MHz, each 6 MHz apart
+        #handle_nec(necpp.nec_fr_card(context, 0, 100, 54, 6)) # checks 100 frequencies above the 54MHz, each 6 MHz apart
+        handle_nec(necpp.nec_fr_card(context, 0, 7, 174, 6)) # checks VHF frequencies 174-216 (VHF high)
 
         
         # Polarization determines A LOT about antenna architecture. We have
@@ -115,20 +114,20 @@ def processAntenna(wiresInput=[(1, 1, 1), (2, 2, 2)]):
         else:
             polarization=1
         # here's where polarization gets applied
-        handle_nec(necpp.nec_ex_card(context, polarization, 36, 36, 0, 0, 0, 0, 10, 10, 0))
+        handle_nec(necpp.nec_ex_card(context, polarization, 1, 2, 0, 0, 0, 0, 10, 10, 0))
 
 
         # this is... quite important. It describes the radiation patterns, particularly where they're coming from.
-        #handle_nec(necpp.nec_rp_card(context, 0, 10, 10, 0,5,0,0, 0, 0, 18, 36, 0, 0)) # all angles above the ground? (satellites)
-        handle_nec(necpp.nec_rp_card(context, 0, 10, 10, 0,5,0,0, 60, 0, 6, 36, 0, 0)) # only 30 degrees above ground? (terrestrial signals)
-        
+        #handle_nec(necpp.nec_rp_card(context, 0, 10, 10, 0,5,0,0, 0, 0, 18, 36, 0, 0)) # all angles above the ground (satellites)
+        #handle_nec(necpp.nec_rp_card(context, 0, 10, 10, 0,5,0,0, 60, 0, 6, 36, 0, 0)) # everywhere 30 degrees above ground? (terrestrial signals)
+        handle_nec(necpp.nec_rp_card(context, 0, 1, 1, 0,0,0,0, 90, 0, 1, 1, 0, 0)) # terrestrial signals, but from one spot along the horizon
         
         # here's the important part:
         mean_gain = necpp.nec_gain_mean(context, 1)
         max_gain = necpp.nec_gain_max(context, 1)
         min_gain = necpp.nec_gain_min(context, 1)
         # MEAN gain in order to make an omnidirectional... but there again it might just maximize a node still?
-        # MAX gain to make a directional antenna,
+        # MAX gain to make a directional antenna, but this will likely only evolve for a single frequency
         # MIN gain to make an omnidirectional, but I am concerned this will penalize nulls too much
 
         necpp.nec_delete(context) # delete now that we have our calculations
@@ -148,34 +147,17 @@ def processAntenna(wiresInput=[(1, 1, 1), (2, 2, 2)]):
 # maybe?
 def fitness(wiresInput):
     wires, wireLength, mean_gain, max_gain, min_gain = processAntenna(wiresInput)
-    return -mean_gain
+    return -min_gain
 
 if __name__=='__main__':
     
     # until I come up with a better way of doing this, I'll record my finished
     # antennas here:
-    #
-    # these commented-out antennas are basically useless; they are evolved to
-    # receive terrestrial tv signals from 60 degrees above the horizon. You may
-    # notice that no tv signals come from that region of the sky!
-    '''
-    # 5 wires, evolved for min gain, for tv frequencies:
-    tvAntenna5Wires_minGain = [-0.2170649,0.08211413,0.11587374,0.11032273,-0.00727395,0.39316114,0.38241553,-0.13979879,0.32285156,0.37539444,0.1980235,0.18295936,0.25851554,0.10262777,0.31215069]
-    
-    # 3 wires, evolved for min gain, for tv frequencies:
-    tvAntenna3Wires_minGain = [-0.36813742,0.04660534,0.20281676,0.36912827,-0.05468209,0.38111223,0.29000245,-0.32773359,0.16520391]
-    
-    # 3 wires, evolved for mean gain, for tv frequencies:
-    tvAntenna3Wires_meanGain = [-0.35906988,-0.15302196,0.16442577,0.35571068,0.0245733,0.29642038,0.33722326,0.34880001,0.10220936]
-    
-    # 3 wires evolved for mean for TV frequencies, but the y axis has been
-    # restricted to 0. This antenna is 2D!
-    tvAntenna3Wires_meanGain_xzPlain = [0.38845274,0,0.21796932,-0.39259615,0,0.39595648,-0.39406343,0,0.10534551]
-    '''
-    # these antennas have been evolved to receive tv signals transmitted from 0
-    # to 30 degrees above the horizon:
-    tvAntenna3Wires_meanGain_xzPlain = [-0.02611375,0,0.04229337,-0.02961295,0,0.05809941,-0.09029584,0,0.05111244]
+    vhf_high_high_gain = [
+        -0.07014296, -0.0564507 ,  0.04133239,  0.03719323, -0.01259205,
+        0.08798588,  0.07666051, -0.01340342,  0.07238057,  0.09172594,
+        0.00238185,  0.01227763, -0.03064843,  0.02131126,  0.01320535
+    ]
 
-
-    wires, wireLength, mean_gain, max_gain, min_gain = processAntenna(tvAntenna3Wires_meanGain_xzPlain)
+    wires, wireLength, mean_gain, max_gain, min_gain = processAntenna(vhf_high_high_gain)
     print(f"mean:{mean_gain}\nmax:{max_gain}\nmin:{min_gain}\ntotal wire length:{wireLength} meters")

@@ -64,15 +64,17 @@ def optimize(num_wires=5):
     # WITHOUT an initial guess!
     results = differential_evolution(
         func = fitness,
-        bounds = [(-0.12,0.12), (-0.01,0.01), (0.01,0.12),] * num_wires,
+        bounds = [(-0.1,0.1), (-0.1,0.1), (0.001,0.1),] * num_wires,
         # modify these ^ dimensions to specify the bounds on antenna shape!
-        popsize = 25,
-        maxiter = 25,
+        popsize = 100,
+        maxiter = 125,
         seed = 3,
         workers = -1,
         disp = True,
         updating = "deferred",
         polish = False,
+        mutation = (0.25, 1.75),
+        recombination = 0.9
     )
     print("best antenna:",results)
     _, wireLength, mean_gain, max_gain, min_gain = processAntenna(baseAntenna)
@@ -81,5 +83,5 @@ def optimize(num_wires=5):
 
 
 if __name__=='__main__':
-    x = optimize(num_wires=3)
+    x = optimize(num_wires=5)
     print(x)
