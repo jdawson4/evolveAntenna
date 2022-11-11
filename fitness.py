@@ -94,7 +94,8 @@ def processAntenna(wiresInput=[(1, 1, 1), (2, 2, 2)]):
         # antenna works for!
         #handle_nec(necpp.nec_fr_card(context, 0, 5, 137, 0.25)) # checks the 137MHz, as well as 4 frequencies 0.25 mhz higher, to cover the entire LEO weather satellite band.
         #handle_nec(necpp.nec_fr_card(context, 0, 100, 54, 6)) # checks 100 frequencies above the 54MHz, each 6 MHz apart
-        handle_nec(necpp.nec_fr_card(context, 0, 7, 174, 6)) # checks VHF frequencies 174-216 (VHF high)
+        #handle_nec(necpp.nec_fr_card(context, 0, 7, 174, 6)) # checks VHF frequencies 174-216 (VHF high)
+        handle_nec(necpp.nec_fr_card(context, 0, 23, 470, 6)) # checks the entire TV UHF band
 
         
         # Polarization determines A LOT about antenna architecture. We have
@@ -147,17 +148,28 @@ def processAntenna(wiresInput=[(1, 1, 1), (2, 2, 2)]):
 # maybe?
 def fitness(wiresInput):
     wires, wireLength, mean_gain, max_gain, min_gain = processAntenna(wiresInput)
-    return -min_gain
+    return -mean_gain
+
+def lengthOfSegments(wires):
+    segment = 1
+    previous = (0.0, 0.0, 0.0)
+    for x2,y2,z2 in wires:
+        x1,y1,z1 = previous
+        length = sqrt(((x1 - x2)**2) + ((y1 - y2)**2) + ((z1 - z2)**2))
+        previous = (x2, y2, z2)
+        print(f"segment {segment}: {length} meters, or {length * 39.37} inches")
+        segment += 1
 
 if __name__=='__main__':
     
     # until I come up with a better way of doing this, I'll record my finished
     # antennas here:
-    vhf_high_high_gain = [
-        -0.07014296, -0.0564507 ,  0.04133239,  0.03719323, -0.01259205,
-        0.08798588,  0.07666051, -0.01340342,  0.07238057,  0.09172594,
-        0.00238185,  0.01227763, -0.03064843,  0.02131126,  0.01320535
+    uhf_high_gain = [
+        -0.05349006, -0.02630232, 0.09886351,
+        -0.09748259, 0.09630158, 0.00102119,
+        0.09976958, -0.09852782, 0.032572
     ]
 
-    wires, wireLength, mean_gain, max_gain, min_gain = processAntenna(vhf_high_high_gain)
-    print(f"mean:{mean_gain}\nmax:{max_gain}\nmin:{min_gain}\ntotal wire length:{wireLength} meters")
+    wires, wireLength, mean_gain, max_gain, min_gain = processAntenna(uhf_high_gain)
+    print(f"mean:{mean_gain}\nmax:{max_gain}\nmin:{min_gain}\ntotal wire length:{wireLength} meters\n")
+    lengthOfSegments(wires)
