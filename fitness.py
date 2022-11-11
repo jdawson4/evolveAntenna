@@ -120,7 +120,7 @@ def processAntenna(wiresInput=[(1, 1, 1), (2, 2, 2)]):
 
         # this is... quite important. It describes the radiation patterns, particularly where they're coming from.
         #handle_nec(necpp.nec_rp_card(context, 0, 10, 10, 0,5,0,0, 0, 0, 18, 36, 0, 0)) # all angles above the ground? (satellites)
-        handle_nec(necpp.nec_rp_card(context, 0, 5, 10, 0,5,0,0, 0, 0, 6, 36, 0, 0)) # only 30 degrees above ground? (terrestrial signals)
+        handle_nec(necpp.nec_rp_card(context, 0, 10, 10, 0,5,0,0, 60, 0, 6, 36, 0, 0)) # only 30 degrees above ground? (terrestrial signals)
         
         
         # here's the important part:
@@ -154,6 +154,11 @@ if __name__=='__main__':
     
     # until I come up with a better way of doing this, I'll record my finished
     # antennas here:
+    #
+    # these commented-out antennas are basically useless; they are evolved to
+    # receive terrestrial tv signals from 60 degrees above the horizon. You may
+    # notice that no tv signals come from that region of the sky!
+    '''
     # 5 wires, evolved for min gain, for tv frequencies:
     tvAntenna5Wires_minGain = [-0.2170649,0.08211413,0.11587374,0.11032273,-0.00727395,0.39316114,0.38241553,-0.13979879,0.32285156,0.37539444,0.1980235,0.18295936,0.25851554,0.10262777,0.31215069]
     
@@ -166,6 +171,11 @@ if __name__=='__main__':
     # 3 wires evolved for mean for TV frequencies, but the y axis has been
     # restricted to 0. This antenna is 2D!
     tvAntenna3Wires_meanGain_xzPlain = [0.38845274,0,0.21796932,-0.39259615,0,0.39595648,-0.39406343,0,0.10534551]
+    '''
+    # these antennas have been evolved to receive tv signals transmitted from 0
+    # to 30 degrees above the horizon:
+    tvAntenna3Wires_meanGain_xzPlain = [-0.02611375,0,0.04229337,-0.02961295,0,0.05809941,-0.09029584,0,0.05111244]
+
 
     wires, wireLength, mean_gain, max_gain, min_gain = processAntenna(tvAntenna3Wires_meanGain_xzPlain)
     print(f"mean:{mean_gain}\nmax:{max_gain}\nmin:{min_gain}\ntotal wire length:{wireLength} meters")

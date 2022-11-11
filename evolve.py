@@ -64,9 +64,9 @@ def optimize(num_wires=5):
     # WITHOUT an initial guess!
     results = differential_evolution(
         func = fitness,
-        bounds = [(-0.4,0.4), (-0.4,0.4), (0.1,0.4),] * num_wires,
+        bounds = [(-0.12,0.12), (-0.01,0.01), (0.01,0.12),] * num_wires,
         # modify these ^ dimensions to specify the bounds on antenna shape!
-        popsize = 100,
+        popsize = 25,
         maxiter = 25,
         seed = 3,
         workers = -1,
