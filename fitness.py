@@ -12,7 +12,7 @@ from math import sqrt
 
 def handle_nec(result):
     if (result != 0):
-        #print(necpp.nec_error_message())
+        print(necpp.nec_error_message())
         return True
     return False
 
@@ -40,10 +40,11 @@ def processAntenna(wiresInput=[(1, 1, 1), (2, 2, 2)]):
     #   VHF low is between 54 and 88 MHz
     #   VHF high is between 174 and 216 MHz
     #   UHF is between 470 and 700 Mhz (seems a little unclear what the upper bound is?)
+    # The GOES satellites broadcast vertically polarized signals. LRIT are at 1.69214 GHz, and HRIT are at 1.6941 GHz, but with much higher bandwidth
     # (higher gain required for higher frequencies because of atmospheric attenuation!)
 
     # sorta want these as parameters but whatever
-    polarizationType='RHC'
+    polarizationType='LIN'
 
     # we have to do some weird preprocessing because the library we're
     # using is based on compiled c/fortran code so it's finicky.
@@ -92,11 +93,11 @@ def processAntenna(wiresInput=[(1, 1, 1), (2, 2, 2)]):
         # define a frequency, and then x other frequencies y steps above that
         # base frequency. Important! This defines how broad of a band our
         # antenna works for!
-        handle_nec(necpp.nec_fr_card(context, 0, 25, 137, 0.04)) # checks the 137MHz-138
+        #handle_nec(necpp.nec_fr_card(context, 0, 25, 137, 0.04)) # checks the 137MHz-138
         #handle_nec(necpp.nec_fr_card(context, 0, 100, 54, 6)) # checks 100 frequencies above the 54MHz, each 6 MHz apart
         #handle_nec(necpp.nec_fr_card(context, 0, 7, 174, 6)) # checks VHF frequencies 174-216 (VHF high)
         #handle_nec(necpp.nec_fr_card(context, 0, 23, 470, 6)) # checks the entire TV UHF band
-
+        handle_nec(necpp.nec_fr_card(context, 0, 5, 1691.94, 0.1)) # the GOES satellites broadcast at 1.69214 GHz
         
         # Polarization determines A LOT about antenna architecture. We have
         # options for prcessing left-handed, right-handed, and linear
@@ -120,10 +121,11 @@ def processAntenna(wiresInput=[(1, 1, 1), (2, 2, 2)]):
 
         # this is... quite important. It describes the radiation patterns, particularly where they're coming from.
         #handle_nec(necpp.nec_rp_card(context, 0, 10, 10, 0,5,0,0, 0, 0, 18, 36, 0, 0)) # all angles above the ground
-        handle_nec(necpp.nec_rp_card(context, 0, 10, 10, 0,5,0,0, 0, 0, 6, 36, 0, 0)) # all >30 degrees above the ground (satellites)
+        #handle_nec(necpp.nec_rp_card(context, 0, 10, 10, 0,5,0,0, 0, 0, 6, 36, 0, 0)) # all >30 degrees above the ground (satellites)
         #handle_nec(necpp.nec_rp_card(context, 0, 10, 10, 0,5,0,0, 60, 0, 6, 36, 0, 0)) # everywhere less than 30 degrees above ground (terrestrial signals)
         #handle_nec(necpp.nec_rp_card(context, 0, 1, 1, 0,0,0,0, 90, 0, 1, 1, 0, 0)) # terrestrial signals, but from one spot along the horizon
-        
+        handle_nec(necpp.nec_rp_card(context, 0, 5, 5, 0,5,0,0, 44.8, 0, 0.1, 0.1, 0, 0)) # points at one point in the sky 45 degrees above the horizon. This happens to be the position of GOES-16 in my area; it is merely a coincidence that this is such a round number.
+
         # here's the important part:
         mean_gain = necpp.nec_gain_mean(context, 1)
         max_gain = necpp.nec_gain_max(context, 1)
@@ -177,6 +179,15 @@ if __name__=='__main__':
         0.08835985, 0.0832063, 0.01526375
     ]
 
-    wires, wireLength, mean_gain, max_gain, min_gain = processAntenna(noaaSatelliteAntenna)
+    goesSatelliteAntenna = [
+        0.08451454, -0.04052971, 0.02772877,
+        -0.05170119, -0.07108256, 0.01826042,
+        0.08303755, -0.06036708, 0.09483542
+    ]
+
+    testingAntenna = goesSatelliteAntenna
+
+    wires, wireLength, mean_gain, max_gain, min_gain = processAntenna(testingAntenna)
     print(f"mean:{mean_gain:.5}\nmax:{max_gain:.5}\nmin:{min_gain:.5}\ntotal wire length:{wireLength:.5} meters, or {(wireLength * 39.37):.5} inches\n")
     lengthOfSegments(wires)
+    print("overall fitness:", round(fitness(testingAntenna), 3))

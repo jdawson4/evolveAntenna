@@ -67,7 +67,7 @@ def optimize(num_wires=5):
         bounds = [(-0.1,0.1), (-0.1,0.1), (0.001,0.1),] * num_wires,
         # modify these ^ dimensions to specify the bounds on antenna shape!
         popsize = 50,
-        maxiter = 250,
+        maxiter = 500,
         seed = 3,
         workers = -1,
         disp = True,
@@ -77,7 +77,7 @@ def optimize(num_wires=5):
         recombination = 0.9
     )
     print("best antenna:",results)
-    _, wireLength, mean_gain, max_gain, min_gain = processAntenna(baseAntenna)
+    _, wireLength, mean_gain, max_gain, min_gain = processAntenna(results.x)
     print(f"mean:{mean_gain}\nmax:{max_gain}\nmin:{min_gain}\ntotal wire length:{wireLength}")
     return results.x
 
