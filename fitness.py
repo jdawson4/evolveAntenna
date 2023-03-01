@@ -45,8 +45,9 @@ def processAntenna(wiresInput=[(1, 1, 1), (2, 2, 2)]):
     # The GOES satellites broadcast vertically polarized signals. LRIT are at 1.69214 GHz, and HRIT are at 1.6941 GHz, but with much higher bandwidth
     # (higher gain required for higher frequencies because of atmospheric attenuation!)
 
-    # sorta want these as parameters but whatever
-    polarizationType='LIN'
+    # sorta want these as parameters but whatever.
+    # options are 'LIN', 'RHC', and 'LHC'
+    polarizationType='RHC'
 
     # we have to do some weird preprocessing because the library we're
     # using is based on compiled c/fortran code so it's finicky.
@@ -90,7 +91,8 @@ def processAntenna(wiresInput=[(1, 1, 1), (2, 2, 2)]):
             # sometimes this messes up though, so return our "failure" signature
             return [], 1.0, -999.0, -999.0, -999.0
         handle_nec(necpp.nec_gn_card(context, 1, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)) # defines ground plane as an infinite surface. Much simpler that way.
-        
+        handle_nec(necpp.nec_gn_card(context, -1, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)) # defines ground plane as an infinite surface. Much simpler that way.
+
         # here we define the frequencies we're looking for. The parameters here
         # define a frequency, and then x other frequencies y steps above that
         # base frequency. Important! This defines how broad of a band our
@@ -126,7 +128,7 @@ def processAntenna(wiresInput=[(1, 1, 1), (2, 2, 2)]):
         #handle_nec(necpp.nec_rp_card(context, 0, 10, 10, 0,5,0,0, 0, 0, 6, 36, 0, 0)) # all >30 degrees above the ground (satellites)
         #handle_nec(necpp.nec_rp_card(context, 0, 10, 10, 0,5,0,0, 60, 0, 6, 36, 0, 0)) # everywhere less than 30 degrees above ground (terrestrial signals)
         #handle_nec(necpp.nec_rp_card(context, 0, 1, 1, 0,0,0,0, 90, 0, 1, 1, 0, 0)) # terrestrial signals, but from one spot along the horizon
-        handle_nec(necpp.nec_rp_card(context, 0, 5, 5, 0,5,0,0, 44.8, 0, 0.1, 0.1, 0, 0)) # points at one point in the sky 45 degrees above the horizon. This happens to be the position of GOES-16 in my area; it is merely a coincidence that this is such a round number.
+        handle_nec(necpp.nec_rp_card(context, 0, 5, 5, 0,5,0,0, 134.8, 0, 0.1, 0.1, 0, 0)) # points at one point in the sky 45 degrees above the horizon. This happens to be the position of GOES-16 in my area; it is merely a coincidence that this is such a round number.
 
         # here's the important part:
         mean_gain = necpp.nec_gain_mean(context, 1)
