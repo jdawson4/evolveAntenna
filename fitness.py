@@ -40,6 +40,8 @@ def processAntenna(wiresInput=[(1, 1, 1), (2, 2, 2)]):
     #   VHF low is between 54 and 88 MHz
     #   VHF high is between 174 and 216 MHz
     #   UHF is between 470 and 700 Mhz (seems a little unclear what the upper bound is?)
+    # ADS-B (for airplane tracking) is vertically polarized at 1090 MHz
+    # The hydrogen line (aka 21 cm line) is a naturally occuring (unpolarized) signal at 1420.405751768 MHz
     # The GOES satellites broadcast vertically polarized signals. LRIT are at 1.69214 GHz, and HRIT are at 1.6941 GHz, but with much higher bandwidth
     # (higher gain required for higher frequencies because of atmospheric attenuation!)
 
