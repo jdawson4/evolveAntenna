@@ -188,6 +188,9 @@ if __name__=='__main__':
         -0.48341465, -0.30803703,  0.31034775,
         0.44899531, -0.08152924, 0.08007004
     ]
+    # I've now confirmed--xnec says that this has two radiation spikes at
+    # around 45 degrees up, and another one at 45 degrees down on the other
+    # side. It's actually pretty cool.
 
     testingAntenna = goesSatelliteAntenna
 
