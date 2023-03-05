@@ -23,12 +23,16 @@ NH     0     1     1      1  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00 
 NE     0    10     1     10 -1.35000E+00  0.00000E+00 -1.35000E+00  3.00000E-01  0.00000E+00  3.00000E-01
 EN     0     0     0      0  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00
 """
+
 # Let's get cracking then!
 def generateNecFile(wires):
-    pass
+    with open('outputAntenna.nec', 'w', encoding="utf-8",) as f:
+        f.write("CM --- NEC2 Input File created or edited by xnec2c 4.1.1 ---\n")
+        f.write("CE --- End Comments ---")
 
 
 if __name__ == "__main__":
+    # this is just a demonstration for this file
     generateNecFile(
         [
             -0.08995548,-0.16057963,0.44024533,
