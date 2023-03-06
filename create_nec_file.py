@@ -76,11 +76,17 @@ def generateNecFile(input_wires):
             # string it all together (get it?)
             restOfString = "     1"+x1String+y1String+z1String+x2String+y2String+z2String+"\n"
 
+            # we actually write the wires here
             f.write(f"GW     {i}"+restOfString)
             
             # after all computation is done, we prep for the next iteration:
             i+=1
             prevLocation = (x,y,z)
+        
+        # great, so the "wires" section is now working. The rest should be
+        # static?
+        # we need ground and exitation and stuff like that now.
+        # Problem: this is encoded in fitness()... should I change that?
 
 
 if __name__ == "__main__":
