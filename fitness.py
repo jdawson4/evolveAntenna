@@ -9,6 +9,7 @@
 import necpp
 from shapely.geometry import LineString
 from math import sqrt
+from shared import *
 
 def handle_nec(result):
     if (result != 0):
@@ -49,22 +50,9 @@ def processAntenna(wiresInput=[(1, 1, 1), (2, 2, 2)]):
     # options are 'LIN', 'RHC', and 'LHC'
     polarizationType='RHC'
 
-    # we have to do some weird preprocessing because the library we're
-    # using is based on compiled c/fortran code so it's finicky.
-    if isinstance(wiresInput[0], tuple):
-        wires = wiresInput
-    elif isinstance(wiresInput[0], float):
-        j = 0
-        wires = []
-        wiresTemp = []
-        for i in wiresInput:
-            j+=1
-            if ((j%3)==0):
-                wiresTemp.append(abs(i)) # ensure that coord 3 is always above 0!
-                wires.append(tuple(wiresTemp))
-                wiresTemp = []
-            else:
-                wiresTemp.append(i)
+    # given a list of floats, returns a list of tuples of floats.
+    # This lets us compute things more better.
+    wires = rephraseWires(wiresInput)
 
     try:
         context = necpp.nec_create()
