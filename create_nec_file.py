@@ -84,9 +84,36 @@ def generateNecFile(input_wires):
             prevLocation = (x,y,z)
         
         # great, so the "wires" section is now working. The rest should be
-        # static?
-        # we need ground and exitation and stuff like that now.
-        # Problem: this is encoded in fitness()... should I change that?
+        # static... except for the frequencies of the incident wave.
+        # Otherwise, everything will be the same: no ground plane,
+        # waves coming from all directions, etc.
+
+        # no ground plane:
+        f.write("GE     0     0   0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00\n")
+
+        # linear excitation, I think:
+        f.write("EX     1     1     1      0  4.50000E+01  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00\n")
+
+        # not sure what this does:
+        f.write("RP     0   100   100      0  0.00000E+00  0.00000E+00  3.60000E+00  3.60000E+00  0.00000E+00  0.00000E+00\n")
+
+        # here's the thing we have to calculate. We need the frequency we're
+        # targeting, and the number of frequencies around that we want to
+        # measure as well.
+        #TODO: REWRITE THIS
+        f.write("FR     0    11     0      0  1.69214E+03  1.00000E-01  1.69314E+03  0.00000E+00  0.00000E+00  0.00000E+00\n")
+
+        # not sure what this does:
+        f.write("NH     0     1     1      1  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00\n")
+
+        # not sure what this does:
+        f.write("NE     0    10     1     10 -1.35000E+00  0.00000E+00 -1.35000E+00  3.00000E-01  0.00000E+00  3.00000E-01\n")
+
+        # not sure what this does:
+        f.write("EN     0     0     0      0  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00")
+        # IMPORTANT: NO LINE ENDING ^ HERE!
+
+        # and that's all! We should have a well-formed .nec file now!
 
 
 if __name__ == "__main__":
