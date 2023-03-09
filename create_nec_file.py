@@ -74,7 +74,7 @@ def generateNecFile(input_wires):
                 z2String = "  " + z2String
 
             # string it all together (get it?)
-            restOfString = "     1"+x1String+y1String+z1String+x2String+y2String+z2String+"\n"
+            restOfString = "     1"+x1String+y1String+z1String+x2String+y2String+z2String+"  5.00000E-03\n"
 
             # we actually write the wires here
             f.write(f"GW     {i}"+restOfString)
@@ -92,7 +92,7 @@ def generateNecFile(input_wires):
         f.write("GE     0     0   0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00\n")
 
         # linear excitation, I think:
-        f.write("EX     1   360   360     0  0.00000E+00  0.00000E+00  0.00000E+00  1.00000E+00  1.00000E+00  1.00000E+00\n")
+        f.write("EX     1   360   360      0  0.00000E+00  0.00000E+00  0.00000E+00  1.00000E+00  1.00000E+00  1.00000E+00\n")
 
         # not sure what this does:
         f.write("RP     0   100   100      0  0.00000E+00  0.00000E+00  3.60000E+00  3.60000E+00  0.00000E+00  0.00000E+00\n")
@@ -102,7 +102,7 @@ def generateNecFile(input_wires):
         # measure as well.
         #TODO: REWRITE THIS
         freqAsString = '%.5E' % Decimal(targetFrequency)
-        f.write(f"FR     0     1     0      0   {freqAsString}  1.00000E+00  {freqAsString}  0.00000E+00  0.00000E+00  0.00000E+00\n")
+        f.write(f"FR     0     1     0      0  {freqAsString}  1.00000E+00  {freqAsString}  0.00000E+00  0.00000E+00  0.00000E+00\n")
 
         # not sure what this does:
         f.write("NH     0     1     1      1  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00\n")
