@@ -1,6 +1,8 @@
 # Author: Jacob Dawson
 #
 # Stores any constants or shared functions for this repo
+targetFrequency = 1691.94
+
 
 def rephraseWires(wiresInput):
     if isinstance(wiresInput[0], tuple):

@@ -85,11 +85,7 @@ def processAntenna(wiresInput=[(1, 1, 1), (2, 2, 2)]):
         # define a frequency, and then x other frequencies y steps above that
         # base frequency. Important! This defines how broad of a band our
         # antenna works for!
-        #handle_nec(necpp.nec_fr_card(context, 0, 25, 137, 0.04)) # checks the 137MHz-138
-        #handle_nec(necpp.nec_fr_card(context, 0, 100, 54, 6)) # checks 100 frequencies above the 54MHz, each 6 MHz apart
-        #handle_nec(necpp.nec_fr_card(context, 0, 7, 174, 6)) # checks VHF frequencies 174-216 (VHF high)
-        #handle_nec(necpp.nec_fr_card(context, 0, 23, 470, 6)) # checks the entire TV UHF band
-        handle_nec(necpp.nec_fr_card(context, 0, 5, 1691.94, 0.1)) # the GOES satellites broadcast at 1.69214 GHz
+        handle_nec(necpp.nec_fr_card(context, 0, 5, targetFrequency, 0.1))
         
         # Polarization determines A LOT about antenna architecture. We have
         # options for prcessing left-handed, right-handed, and linear

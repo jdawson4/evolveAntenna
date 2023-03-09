@@ -101,7 +101,8 @@ def generateNecFile(input_wires):
         # targeting, and the number of frequencies around that we want to
         # measure as well.
         #TODO: REWRITE THIS
-        f.write("FR     0    11     0      0  1.69214E+03  1.00000E-01  1.69314E+03  0.00000E+00  0.00000E+00  0.00000E+00\n")
+        freqAsString = '%.5E' % Decimal(targetFrequency)
+        f.write(f"FR     0     1     0     0  {freqAsString}  1.00000E+00  {freqAsString}  0.00000E+00  0.00000E+00  0.00000E+00\n")
 
         # not sure what this does:
         f.write("NH     0     1     1      1  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00\n")
