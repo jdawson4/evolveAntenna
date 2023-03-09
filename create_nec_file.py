@@ -111,7 +111,7 @@ def generateNecFile(input_wires):
         f.write("NE     0    10     1     10 -1.35000E+00  0.00000E+00 -1.35000E+00  3.00000E-01  0.00000E+00  3.00000E-01\n")
 
         # not sure what this does:
-        f.write("EN     0     0     0      0  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00")
+        f.write("EN     0     0     0      0  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00\n")
         # IMPORTANT: NO LINE ENDING ^ HERE!
 
         # and that's all! We should have a well-formed .nec file now!
