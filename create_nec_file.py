@@ -100,7 +100,6 @@ def generateNecFile(input_wires):
         # here's the thing we have to calculate. We need the frequency we're
         # targeting, and the number of frequencies around that we want to
         # measure as well.
-        #TODO: REWRITE THIS
         freqAsString = '%.5E' % Decimal(targetFrequency)
         f.write(f"FR     0     1     0      0  {freqAsString}  1.00000E+00  {freqAsString}  0.00000E+00  0.00000E+00  0.00000E+00\n")
 
@@ -112,17 +111,23 @@ def generateNecFile(input_wires):
 
         # not sure what this does:
         f.write("EN     0     0     0      0  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00\n")
-        # IMPORTANT: NO LINE ENDING ^ HERE!
 
         # and that's all! We should have a well-formed .nec file now!
 
 
 if __name__ == "__main__":
-    # this is just a demonstration for this file
+    # this is just a demonstration for this file, ideally we'd want our
+    # evolution script to generate a .nec file on its own.
     generateNecFile(
+        # note that either way works here:
+        #[
+        #    (-0.08995548,-0.16057963,0.44024533),
+        #    (-0.48341465,-0.30803703,0.31034775),
+        #    (0.44899531,-0.08152924,0.08007004)
+        #]
         [
-            (-0.08995548,-0.16057963,0.44024533),
-            (-0.48341465,-0.30803703,0.31034775),
-            (0.44899531,-0.08152924,0.08007004)
+            -0.08995548,-0.16057963,0.44024533,
+            -0.48341465,-0.30803703,0.31034775,
+            0.44899531,-0.08152924,0.08007004
         ]
     )
