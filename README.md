@@ -11,5 +11,7 @@ The idea here is to either make an evolutionary algorithm (or some other kind of
 3. scipy, for scientific processing. We'll be using its optimization functions to do some quick antenna-designing
 4. shapely, which is a geometry library which we're using to make sure that we aren't getting our wires crossed
 
+You can also check out xnec2c here, https://www.xnec2c.org/, which helps me to visualize the results. The script create_nec_file.py can take any string of floats and create a .nec file for viewing in xnec2c.
+
 Massive thanks to Timothy Molteno, whose NEC++ rewrite into C++ and Python made this project possible. The repository here https://github.com/tmolteno/necpp asks that I credit that work like so:
 Timothy C.A. Molteno, ''NEC2++: An NEC-2 compatible Numerical Electromagnetics Code'', Electronics Technical Reports No. 2014-3, ISSN 1172-496X, October 2014.
