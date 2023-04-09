@@ -11,6 +11,8 @@
 # have done, so that's a win!
 
 from fitness import *
+from create_nec_file import *
+
 #from scipy.optimize import minimize
 #from scipy.optimize import basinhopping
 from scipy.optimize import differential_evolution
@@ -66,8 +68,8 @@ def optimize(num_wires=5):
         func = fitness,
         bounds = [(-0.5,0.5), (-0.5,0.5), (0.001,0.5),] * num_wires,
         # modify these ^ dimensions to specify the bounds on antenna shape!
-        popsize = 50,
-        maxiter = 100,
+        popsize = 5,
+        maxiter = 10,
         seed = 3,
         workers = -1,
         disp = True,
@@ -79,6 +81,9 @@ def optimize(num_wires=5):
     print("best antenna:",results)
     _, wireLength, mean_gain, max_gain, min_gain = processAntenna(results.x)
     print(f"mean:{mean_gain}\nmax:{max_gain}\nmin:{min_gain}\ntotal wire length:{wireLength}")
+
+    generateNecFile(results.x)
+
     return results.x
 
 
