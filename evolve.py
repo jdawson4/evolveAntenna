@@ -68,8 +68,9 @@ def optimize(num_wires=5):
         func = fitness,
         bounds = [(-0.5,0.5), (-0.5,0.5), (0.001,0.5),] * num_wires,
         # modify these ^ dimensions to specify the bounds on antenna shape!
-        popsize = 5,
-        maxiter = 10,
+        strategy = 'best1exp',
+        popsize = 20,
+        maxiter = 2000,
         seed = 3,
         workers = -1,
         disp = True,
@@ -90,3 +91,16 @@ def optimize(num_wires=5):
 if __name__=='__main__':
     x = optimize(num_wires=3)
     print(x)
+
+# GOES hyperparameter notes:
+# 5 wires, 25 pop, 1000 its: 64 gain
+# 3 wires, 25 pop, 1000 its: 55 gain
+# 6 wires, 10 pop, 1000 its: 53 gain
+# 7 wires, 20 pop, 250 its: 49 gain
+# 4 wires, 20 pop, 1000 its: 66 gain
+# 4 wires, 20 pop, 1750 its, 'best1exp': 74 gain
+# 5 wires, 20 pop, 1750 its, 'best1exp': 68 gain
+# 3 wires, 20 pop, 2000 its, 'best1exp': 378 gain?!?!?! Here's the wires:
+# [-0.20416053,  0.07161635,  0.36164236, 
+# 0.3452918 , -0.00245619, 0.18162565,
+# -0.36832532, -0.37111087,  0.05979764]

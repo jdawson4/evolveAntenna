@@ -48,7 +48,7 @@ def processAntenna(wiresInput=[(1, 1, 1), (2, 2, 2)]):
 
     # sorta want these as parameters but whatever.
     # options are 'LIN', 'RHC', and 'LHC'
-    polarizationType='RHC'
+    polarizationType='LIN'
 
     # given a list of floats, returns a list of tuples of floats.
     # This lets us compute things more better.
@@ -78,8 +78,8 @@ def processAntenna(wiresInput=[(1, 1, 1), (2, 2, 2)]):
         if(handle_nec(necpp.nec_geometry_complete(context, 1))): # says that we've now set the antenna geometry
             # sometimes this messes up though, so return our "failure" signature
             return [], 1.0, -999.0, -999.0, -999.0
-        handle_nec(necpp.nec_gn_card(context, 1, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)) # defines ground plane as an infinite surface. Much simpler that way.
-        handle_nec(necpp.nec_gn_card(context, -1, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)) # defines ground plane as an infinite surface. Much simpler that way.
+        #handle_nec(necpp.nec_gn_card(context, 1, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)) # defines ground plane as an infinite surface. Much simpler that way.
+        handle_nec(necpp.nec_gn_card(context, -1, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)) # defines no ground plane. Much simpler that way.
 
         # here we define the frequencies we're looking for. The parameters here
         # define a frequency, and then x other frequencies y steps above that
